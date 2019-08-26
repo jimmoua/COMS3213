@@ -1,0 +1,4 @@
+*.out
+makefile
+Makefile
+*.o

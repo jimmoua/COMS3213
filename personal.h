@@ -15,6 +15,9 @@ class Personal {
     int size() const {
       return 9 + nameLen + cityLen + sizeof(year) + sizeof(salary);
     }
+    bool operator==(const Personal& pr) const {
+      return (std::strncmp(pr.SSN, SSN, 9) == 0);
+    }
   protected:
     const int nameLen, cityLen;
     char SSN[10], *name, *city;

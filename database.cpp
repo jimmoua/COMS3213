@@ -100,6 +100,6 @@ void Database<T>::run() {
 }
 
 int main() {
-  //Database<Personal>().run();
+  Database<Personal>().run();
   return 0;
 }
