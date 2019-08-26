@@ -16,11 +16,21 @@ Personal::Personal(char* ssn, char* n, char* c, int y, long s): nameLen(10), cit
 }
 
 void Personal::writetoFile(std::fstream& out) const {
+
+  /* ------------------------------ */
+  /*std::cout << SSN << std::endl;
+  std::cout << name << std::endl;
+  std::cout << city << std::endl;
+  std::cout << year << std::endl;
+  std::cout << salary << std::endl;*/
+  /* ------------------------------ */
+
+  /* Writes SSN, name, and city */
   out.write(SSN, 9);
   out.write(name, nameLen);
   out.write(city,cityLen);
   out.write(reinterpret_cast<const char*>(&year), sizeof(int));
-  out.write(reinterpret_cast<const char*>(&salary), sizeof(int));
+  out.write(reinterpret_cast<const char*>(&salary), sizeof(long));
 }
 
 void Personal::readFromFile(std::fstream& in) {
@@ -28,7 +38,7 @@ void Personal::readFromFile(std::fstream& in) {
   in.read(name, nameLen);
   in.read(city, cityLen);
   in.read(reinterpret_cast<char*>(&year), sizeof(int));
-  in.read(reinterpret_cast<char*>(&salary), sizeof(int));
+  in.read(reinterpret_cast<char*>(&salary), sizeof(long));
 }
 
 void Personal::readKey() {
@@ -52,6 +62,9 @@ std::istream& Personal::readFromConsole(std::istream& in) {
   std::cout << "SSN: ";
   in.getline(s, 80);
   std::strncpy(SSN, s, 9);
+  std::cout << "Name: ";
+  in.getline(s, 80);
+  std::strncpy(name, s, nameLen);
   std::cout << "City: ";
   in.getline(s, 80);
   std::strncpy(city, s, cityLen);

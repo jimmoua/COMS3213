@@ -8,7 +8,7 @@ Database<T>::Database() { }
 
 template<class T>
 void Database<T>::add(T& d) {
-  database.open(fName, std::ios::in|std::ios::out|std::ios::binary);
+  database.open(fName, (std::ios::in|std::ios::out|std::ios::binary));
   database.seekp(0, std::ios::end);
   d.writetoFile(database);
   database.close();
@@ -52,11 +52,12 @@ std::ostream& Database<T>::print(std::ostream& out) {
   T tmp;
   database.open(fName, std::ios::in|std::ios::binary);
   while(true) {
+    /* The error is probably somewhere in this readFromFile function */
     tmp.readFromFile(database);
     if(database.eof()) {
       break;
     }
-    out << tmp << std::endl;
+    out << tmp << std::endl; // overloaded <<
   }
   database.close();
   return out;
@@ -68,12 +69,12 @@ void Database<T>::run() {
   std::cin >> fName;
   char option[5];
   T rec;
-  std::cout << "1. Add\n 2. Find\n 3. Modify a record\n 4. Exit\n\n";
+  std::cout << "1. Add\n2. Find\n3. Modify a record\n4. Exit\n\n";
   std::cout << "Enter an option: ";
   std::cin.getline(option, 4);
   while(std::cin.getline(option, 4)) {
     if(*option == '1') {
-      std::cin >> rec;
+      std::cin >> rec; //overloaded >>
       add(rec);
     }
     else if(*option == '2') {
@@ -100,6 +101,6 @@ void Database<T>::run() {
 }
 
 int main() {
-  Database<Personal>().run();
+  Database<Student>().run();
   return 0;
 }
