@@ -18,7 +18,7 @@ void Student::writetoFile(std::fstream& out) const {
 }
 
 void Student::readFromFile(std::fstream& in) {
-  Personal::readFromFile(in);
+  Personal::readFromFile(in); // ← here?
   in.read(major, majorLen);
 }
 

@@ -16,19 +16,11 @@ Personal::Personal(char* ssn, char* n, char* c, int y, long s): nameLen(10), cit
 }
 
 void Personal::writetoFile(std::fstream& out) const {
-
-  /* ------------------------------ */
-  /*std::cout << SSN << std::endl;
-  std::cout << name << std::endl;
-  std::cout << city << std::endl;
-  std::cout << year << std::endl;
-  std::cout << salary << std::endl;*/
-  /* ------------------------------ */
-
   /* Writes SSN, name, and city */
   out.write(SSN, 9);
   out.write(name, nameLen);
   out.write(city,cityLen);
+  /* Type cast into a C styled string */
   out.write(reinterpret_cast<const char*>(&year), sizeof(int));
   out.write(reinterpret_cast<const char*>(&salary), sizeof(long));
 }
@@ -37,6 +29,8 @@ void Personal::readFromFile(std::fstream& in) {
   in.read(SSN, 9);
   in.read(name, nameLen);
   in.read(city, cityLen);
+  /* Read into a char with sizeof(datatype) and reinterpret the C styled string
+   * back into its original type. */
   in.read(reinterpret_cast<char*>(&year), sizeof(int));
   in.read(reinterpret_cast<char*>(&salary), sizeof(long));
 }
