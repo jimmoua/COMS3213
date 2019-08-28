@@ -14,6 +14,7 @@ BIN_DIR=./
 # Compile flags
 CFLAGS= -lstdc++ \
 				-std=c++11 \
+				-g
 
 # Warning flags
 WFLAGS= -Wall \

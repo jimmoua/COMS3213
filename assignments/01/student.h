@@ -6,6 +6,10 @@ class Student: public Personal {
   public:
     Student();
     Student(char*, char*, char*, int, long, char*);
+    /* The book does not have a dtor, so I added one */
+    ~Student() {
+      delete [] major;
+    }
     void writetoFile(std::fstream&) const;
     void readFromFile(std::fstream&);
     int size() const{

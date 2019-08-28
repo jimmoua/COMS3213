@@ -1,10 +1,12 @@
 #include "personal.h"
 
+/* Default ctor */
 Personal::Personal(): nameLen(10), cityLen(10) {
   name = new char[nameLen+1];
   city = new char[cityLen+1];
 }
 
+/* User def ctor */
 Personal::Personal(char* ssn, char* n, char* c, int y, long s): nameLen(10), cityLen(10) { 
   name = new char[nameLen+1];
   city = new char[cityLen+1];
