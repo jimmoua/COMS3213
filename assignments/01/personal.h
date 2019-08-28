@@ -13,10 +13,11 @@ class Personal {
     void readFromFile(std::fstream&);
     void readKey();
     int size() const {
+      /* 9 = SSN */
       return 9 + nameLen + cityLen + sizeof(year) + sizeof(salary);
     }
     bool operator==(const Personal& pr) const {
-      return (std::strncmp(pr.SSN, SSN, 9) == 0);
+      return (strncmp(pr.SSN, SSN, 9) == 0);
     }
     ~Personal() {
       delete [] name;

@@ -10,9 +10,9 @@ Personal::Personal(): nameLen(10), cityLen(10) {
 Personal::Personal(char* ssn, char* n, char* c, int y, long s): nameLen(10), cityLen(10) { 
   name = new char[nameLen+1];
   city = new char[cityLen+1];
-  std::strcpy(SSN, ssn);
-  std::strcpy(name, n);
-  std::strcpy(city, c);
+  strcpy(SSN, ssn);
+  strcpy(name, n);
+  strcpy(city, c);
   year = y;
   salary = s;
 }
@@ -41,7 +41,7 @@ void Personal::readKey() {
   char s[80];
   std::cout << "Enter SSN: ";
   std::cin.getline(s, 80);
-  std::strncpy(SSN, s, 9);
+  strncpy(SSN, s, 9);
 }
 
 std::ostream& Personal::writeLegibly(std::ostream& out) {
@@ -57,13 +57,13 @@ std::istream& Personal::readFromConsole(std::istream& in) {
   char s[80];
   std::cout << "SSN: ";
   in.getline(s, 80);
-  std::strncpy(SSN, s, 9);
+  strncpy(SSN, s, 9);
   std::cout << "Name: ";
   in.getline(s, 80);
-  std::strncpy(name, s, nameLen);
+  strncpy(name, s, nameLen);
   std::cout << "City: ";
   in.getline(s, 80);
-  std::strncpy(city, s, cityLen);
+  strncpy(city, s, static_cast<size_t>(cityLen));
   std::cout << "Birthyear: ";
   in >> year;
   std::cout << "Salary: ";

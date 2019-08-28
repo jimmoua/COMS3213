@@ -21,9 +21,12 @@
  * Output: 
  *   When the program receives data, it will output in the following format:
  *
- *       SSN = , name = , city = , year = , salary = , major = 
+ *       SSN = , name = , city = , year = , salary =
  *
- *        where there will be some information between the equal sign comma
+ *        where there will be some information between the equal sign comma. If
+ *        Student is used, there will be a field that displays the major:
+ *
+ *       SSN = , name = , city = , year = , salary = , major =
  *
  * Assumption:
  *   Originally, the program the book originally gives us will become stuck
@@ -146,8 +149,8 @@ void Database<T>::run() {
 }
 
 int main() {
-
-  Database<Student>().run();
-
+  /* Only one run function may run at a time */
+  Database<Personal>().run();
+  //Database<Student>().run();
   return 0;
 }
