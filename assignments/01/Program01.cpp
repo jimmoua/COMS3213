@@ -120,7 +120,7 @@ void Database<T>::run() {
   while(std::cin.getline(option, 4)) {
     if(*option == '1') {
       std::cin >> rec; //overloaded >>
-      add(rec); // having a minor leak here if it's set to student
+      add(rec);
     }
     else if(*option == '2') {
       rec.readKey();
@@ -146,7 +146,8 @@ void Database<T>::run() {
 }
 
 int main() {
-  //Database<Personal>().run();
+
   Database<Student>().run();
+
   return 0;
 }

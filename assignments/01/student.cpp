@@ -15,10 +15,9 @@ Student::Student() : majorLen(10) {
    *     return in
    *  But this will only write the first 9 characters of the string.
    *  Because each character is the string is equal to 1 byte (which is also
-   *  the same size as majorLen), I have replaced it with:
-   *     ...
-   *     std::strncyp(major, s, static_cast<size_t>(majorLen);
+   *  the same size as majorLen)
    *  so that it will record the full string. */
+  major = new char[majorLen+1];
 }
 
 /* majorLen is 10 above, but 11 here (copied from book so not sure why) */
@@ -51,7 +50,9 @@ std::istream& Student::readFromConsole(std::istream& in) {
   char s[80];
   std::cout << "Major: ";
   in.getline(s, 80);
-  /* Major is copied for 9?... */
+  /* Major is copied for 9 = majorLen */
+  /* TODO left off here */
+  std::cout << "sizeof s is : " << sizeof(s) << std::endl;
   std::strncpy(major, s, static_cast<size_t>(majorLen));
   return in;
 }
