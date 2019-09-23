@@ -9,16 +9,11 @@
  * Special Processing Requirements: None
  *
  * --------------------------------------------------------------------------*/
+
 #include <iostream>
 #include <stack>
 
-void printStack(std::stack<int> _s) {
-  while(!_s.empty()) {
-    std::cout << _s.top() << " ";
-    _s.pop();
-  }
-  std::cout << std::endl;
-}
+void printStack(std::stack<int>);
 void ReverseStack(std::stack<int>&);
 
 int main() {
@@ -57,4 +52,12 @@ void ReverseStack(std::stack<int>& S) {
     S.push(s2.top());
     s2.pop();
   }
+}
+
+void printStack(std::stack<int> _s) {
+  while(!_s.empty()) {
+    std::cout << _s.top() << " ";
+    _s.pop();
+  }
+  std::cout << std::endl;
 }
