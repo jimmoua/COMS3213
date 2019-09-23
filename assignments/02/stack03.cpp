@@ -1,4 +1,3 @@
-
 /* ----------------------------------------------------------------------------
  * Jim Moua
  * Program 2c
@@ -46,15 +45,23 @@ void printStack(std::stack<int> _s) {
 }
 
 void ReverseStack(std::stack<int>& S, size_t size) {
-  if(size == 1){
+  int tmp;
+  static std::stack<int> ss;
+  static bool moved = false;
+  if(!moved) {
+    while(!S.empty()) {
+      ss.push(S.top());
+      S.pop();
+    }
+    std::swap(S, ss);
+    moved = true;
+  }
+  if(size == 0) {
     return;
   }
-  int tmp;
-  std::stack<int> _s;
-  _s.push(S.top());
+  ss.push(S.top());
   S.pop();
-  tmp = _s.top();
-  S.push(tmp);
-  _s.pop();
-  (ReverseStack(S, size-1));
+  tmp = ss.top();
+  ss.pop();
+  ReverseStack(S, size-1);
 }
