@@ -45,23 +45,19 @@ void printStack(std::stack<int> _s) {
 }
 
 void ReverseStack(std::stack<int>& S, size_t size) {
-  int tmp;
   static std::stack<int> ss;
   static bool moved = false;
   if(!moved) {
-    while(!S.empty()) {
+    while(!S.empty()) { 
       ss.push(S.top());
       S.pop();
     }
-    std::swap(S, ss);
     moved = true;
   }
-  if(size == 0) {
-    return;
-  }
-  ss.push(S.top());
-  S.pop();
-  tmp = ss.top();
+  if(size == 0) return;
+  int tmp = ss.top();
   ss.pop();
+  /* Via recurrsion! */
   ReverseStack(S, size-1);
+  S.push(tmp);
 }
