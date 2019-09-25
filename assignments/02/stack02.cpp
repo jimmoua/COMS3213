@@ -36,7 +36,19 @@ int main() {
   printStack(S);
   return 0;
 }
-
+/* ****************************************************************************
+ * Function: void printStack(std::stack)
+ *
+ * Description:
+ * This function will print the stack in LIFO order. If the stack is empty,
+ * nothing will be printed.
+ *
+ * Preconditions:
+ * None.
+ *
+ * Postconditions:
+ * None
+ * ***************************************************************************/
 void printStack(std::stack<int> _s) {
   while(!_s.empty()) {
     std::cout << _s.top() << " ";
@@ -45,6 +57,19 @@ void printStack(std::stack<int> _s) {
   std::cout << std::endl;
 }
 
+/* ****************************************************************************
+ * Function: voice ReverseStack(std::stack<int>& S)
+ *
+ * Description:
+ * This function takes a STL stack and reverses it.
+ *
+ * Preconditions:
+ * None.
+ *
+ * Postconditions:
+ * Since the STL stack is passed by reference the given stack parameter will be
+ * changed.
+ * ***************************************************************************/
 void ReverseStack(std::stack<int>& S) {
   /* Create the queue from STL */
   std::queue<int> q;
@@ -61,3 +86,4 @@ void ReverseStack(std::stack<int>& S) {
     q.pop();
   }
 }
+

@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stack>
 
+/* Function prototypes */
 void printStack(std::stack<int>);
 void ReverseStack(std::stack<int>&);
 
@@ -36,28 +37,61 @@ int main() {
   return 0;
 }
 
-void ReverseStack(std::stack<int>& S) {
-  /* Below are the two additional stacks */
-  std::stack<int> s1;
-  std::stack<int> s2;
-  while(!S.empty()) {
-    s1.push(S.top());
-    S.pop();
-  }
-  while(!s1.empty()) {
-    s2.push(s1.top());
-    s1.pop();
-  }
-  while(!s2.empty()) {
-    S.push(s2.top());
-    s2.pop();
-  }
-}
-
+/* ****************************************************************************
+ * Function: void printStack(std::stack)
+ *
+ * Description:
+ * This function will print the stack in LIFO order. If the stack is empty,
+ * nothing will be printed.
+ *
+ * Preconditions:
+ * None.
+ *
+ * Postconditions:
+ * None
+ * ***************************************************************************/
 void printStack(std::stack<int> _s) {
   while(!_s.empty()) {
     std::cout << _s.top() << " ";
     _s.pop();
   }
   std::cout << std::endl;
+}
+
+/* ****************************************************************************
+ * Function: voice ReverseStack(std::stack<int>& S)
+ *
+ * Description:
+ * This function takes a STL stack and reverses it.
+ *
+ * Preconditions:
+ * None.
+ *
+ * Postconditions:
+ * Since the STL stack is passed by reference the given stack parameter will be
+ * changed.
+ * ***************************************************************************/
+void ReverseStack(std::stack<int>& S) {
+  /* Below are the two additional stacks */
+  std::stack<int> s1;
+  std::stack<int> s2;
+
+  /* Add from the original stack to the first stack. This will reverse it */
+  while(!S.empty()) {
+    s1.push(S.top());
+    S.pop();
+  }
+
+  /* Add from the first stack to the second stack. This will return it to its
+   * original. */
+  while(!s1.empty()) {
+    s2.push(s1.top());
+    s1.pop();
+  }
+
+  /* Add from the second stack to the original. This will reverse it again */
+  while(!s2.empty()) {
+    S.push(s2.top());
+    s2.pop();
+  }
 }
