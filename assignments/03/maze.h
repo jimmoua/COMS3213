@@ -1,30 +1,8 @@
-#include <iostream>
-#include <string>
-#include <stack>
-#include <cstring>
-
-template<typename T>
-class Stack: public std::stack<T> {
-  public:
-    T pop() {
-      T tmp = std::stack<T>::top();
-      std::stack<T>::pop();
-      return tmp;
-    }
-};
-
-class Cell {
-  public:
-    Cell(int i = 0, int j = 0) {
-      x = i; y = j;
-    }
-    bool operator==(const Cell& c) const {
-      return (x == c.x && y == c.y);
-    }
-  private:
-    int x, y;
-    friend class Maze;
-};
+#ifndef MAZE_H
+#define MAZE_H
+#include "Cell.h"
+#include <bits/stdc++.h>
+#include "Stack.h"
 
 class Maze {
   public:
@@ -34,10 +12,10 @@ class Maze {
   private:
     Cell currentCell, exitCell, entryCell;
     static constexpr char exitMarker  = 'e';
-    static const char entryMarker     = 'm';
-    static const char visited         = '.';
-    static const char passage         = '0';
-    static const char wall            = '1';
+    static constexpr char entryMarker = 'm';
+    static constexpr char visited     = '.';
+    static constexpr char passage     = '0';
+    static constexpr char wall        = '1';
     Stack<Cell> mazeStack;
     char** store;
     void pushUnvisited(int,int);
@@ -49,12 +27,12 @@ Maze::Maze() {
   Stack<char*> mazeRows;
   char str[80], *s;
   int col, row = 0;
-  std::cout << "Enter a rectangular maze using the following characters:\n";
-  std::cout << "m - entry\n";
-  std::cout << "e - exit\n";
-  std::cout << "1 - wall\n";
-  std::cout << "0 - passage\n";
-  std::cout << "Enter one line at a time; end with Ctrl-d:\n";
+  printf("Enter a rectangular maze using the following characers:\n");
+  printf("%c - entry\n", entryMarker);
+  printf("%c - exit\n", exitMarker);
+  printf("%c - wall\n", wall);
+  printf("%c - passage\n", passage);
+  printf("Enter one line at a time. End with Ctrl-d\n");
 
   while(std::cin >> str) {
     row++;
@@ -77,7 +55,7 @@ Maze::Maze() {
   }
 
   rows = row;
-  store = new char* [rows+2];
+  store = new char*[rows+2];
   store[0] = new char[cols+3];
   for(; !mazeRows.empty(); row--) {
     store[row] = mazeRows.pop();
@@ -97,19 +75,28 @@ void Maze::pushUnvisited(int row, int col) {
 }
 
 void Maze::exitMaze() {
+  /* Use row and col to mark and keep track of current location, and set the
+   * starting location to be the entry cell. */
   int row, col;
   currentCell = entryCell;
   while(!(currentCell == exitCell)) {
     row = currentCell.x;
     col = currentCell.y;
     std::cout << *this;
+
+    /* Mark the current location as visited */
     if(!(currentCell == entryCell)) {
       store[row][col] = visited;
     }
+
+    /* Mark all adjacent nodes in the matrix as unvisited */
     pushUnvisited(row-1, col);
     pushUnvisited(row+1, col);
     pushUnvisited(row, col-1);
     pushUnvisited(row, col+1);
+
+    /* If previous iteration of while loop gave us an empty stack, mouse failed
+     * to get out of the maze */
     if(mazeStack.empty()) {
       std::cout << *this;
       std::cout << "Failure\n";
@@ -129,7 +116,12 @@ std::ostream& operator<<(std::ostream& os, const Maze& maze) {
   return os;
 }
 
-int main() {
-  Maze().exitMaze();
-  return 0;
+/* Destructor */
+Maze::~Maze() {
+  for(int i = 0; i < rows+2; i++) {
+    delete [] this->store[i];
+  }
+  delete [] this->store;
 }
+
+#endif
