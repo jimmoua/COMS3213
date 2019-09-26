@@ -3,17 +3,10 @@
 #include <stack>
 #include <cstring>
 
-namespace {
-  static long long times = 0;
-}
-
 template<typename T>
 class Stack: public std::stack<T> {
   public:
     T pop() {
-      /* The original is
-       *   T tmp = top();
-       * but there is no top from this class or any inherited */
       T tmp = std::stack<T>::top();
       std::stack<T>::pop();
       return tmp;
@@ -36,10 +29,15 @@ class Cell {
 class Maze {
   public:
     Maze();
+    ~Maze();
     void exitMaze();
   private:
     Cell currentCell, exitCell, entryCell;
-    const char exitMarker, entryMarker, visited, passage, wall;
+    static constexpr char exitMarker  = 'e';
+    static const char entryMarker     = 'm';
+    static const char visited         = '.';
+    static const char passage         = '0';
+    static const char wall            = '1';
     Stack<Cell> mazeStack;
     char** store;
     void pushUnvisited(int,int);
@@ -47,17 +45,16 @@ class Maze {
     int rows, cols;
 };
 
-Maze::Maze() : exitMarker('e'),
-               entryMarker('m'),
-               visited('.'),
-               passage('0'),
-               wall('1') {
+Maze::Maze() {
   Stack<char*> mazeRows;
   char str[80], *s;
   int col, row = 0;
-  std::cout << "Enter a rectangular maze using the following "
-             << "characters:\nm - entry\ne - exit\n1 - wall\n0 - passage\n"
-             << "Enter one line at a time; end with Ctrl-z:\n";
+  std::cout << "Enter a rectangular maze using the following characters:\n";
+  std::cout << "m - entry\n";
+  std::cout << "e - exit\n";
+  std::cout << "1 - wall\n";
+  std::cout << "0 - passage\n";
+  std::cout << "Enter one line at a time; end with Ctrl-d:\n";
 
   while(std::cin >> str) {
     row++;
@@ -102,8 +99,7 @@ void Maze::pushUnvisited(int row, int col) {
 void Maze::exitMaze() {
   int row, col;
   currentCell = entryCell;
-  while(!(currentCell == entryCell)) {
-    times++;
+  while(!(currentCell == exitCell)) {
     row = currentCell.x;
     col = currentCell.y;
     std::cout << *this;
@@ -135,6 +131,5 @@ std::ostream& operator<<(std::ostream& os, const Maze& maze) {
 
 int main() {
   Maze().exitMaze();
-  printf("%lld\n", times);
   return 0;
 }
