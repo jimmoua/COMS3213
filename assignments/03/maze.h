@@ -1,8 +1,9 @@
 #ifndef MAZE_H
 #define MAZE_H
 #include "Cell.h"
-#include <bits/stdc++.h>
 #include "Stack.h"
+#include <cstring>
+#include <iostream>
 
 /* ****************************************************************************
  * Class: Maze
