@@ -4,6 +4,17 @@
 #include <bits/stdc++.h>
 #include "Stack.h"
 
+/* ****************************************************************************
+ * Class: Maze
+ *
+ * Description:
+ * This is the simple structure that is used to contain the map, which is
+ * represented by some ASCII characters. The original assignment in the book
+ * assigned the const values of the markers in the default constructor, but I
+ * set the values here in the class, since it much more convenient and the
+ * formatting looks much nicer.
+ *
+ * ***************************************************************************/
 class Maze {
   public:
     Maze();
@@ -23,6 +34,26 @@ class Maze {
     int rows, cols;
 };
 
+/* ****************************************************************************
+ * Function: Maze::Maze()
+ *
+ * Description:
+ * This is the default constructor of the Maze class. It will take inputs of N
+ * lines and the user will stop these inputs by pressing ^d (ctrl-d). The
+ * original assignment as per the book was to have the users exit by pressing
+ * ^z (ctrl-z), but on many Linux systems, that is the shortcut to pause a
+ * program and "minimize" it.
+ *
+ * Preconditions:
+ * None
+ *
+ * Postconditions:
+ * Since this is the constructor, an obvious thing it does is some small
+ * "set-up" stuff.  After taking N lines of input, which should represent the
+ * maze, the constructor will surround that maze with walls which represent a
+ * '1'.
+ *
+ * ***************************************************************************/
 Maze::Maze() {
   Stack<char*> mazeRows;
   char str[80], *s;
@@ -68,12 +99,43 @@ Maze::Maze() {
   }
 }
 
+/* ****************************************************************************
+ * Function: Maze::pushUnvisited(int row, int col)
+ *
+ * Description:
+ * Pushes the x,y locations of the unvisted nodes into the maze stack.
+ *
+ * Preconditions:
+ * row and col are representations of the unvisited nodes if we represent the
+ * maze in matrix form.
+ *
+ * Postconditions:
+ * If the surrounding node of the current cell is not a wall nor is it a
+ * visited area, we will push that surround node into the mazeStack. This means
+ * only the locations of unvisited '0' and the exit marker 'e' will be pushed
+ * into the stack.
+ *
+ * ***************************************************************************/
 void Maze::pushUnvisited(int row, int col) {
   if(store[row][col] == passage || store[row][col] == exitMarker) {
     mazeStack.push(Cell(row,col));
   }
 }
 
+/* ****************************************************************************
+ * Function: void Maze::exitMaze()
+ *
+ * Description:
+ * This will emulate the mouse 'e' escaping the maze.
+ *
+ * Preconditions:
+ * None
+ *
+ * Postconditions:
+ * This will invoke the pushUnivisted functions and pop the mazeStack until
+ * there are no more contents in it.
+ *
+ * ***************************************************************************/
 void Maze::exitMaze() {
   /* Use row and col to mark and keep track of current location, and set the
    * starting location to be the entry cell. */
@@ -108,6 +170,19 @@ void Maze::exitMaze() {
   std::cout << "Success\n";
 }
 
+/* ****************************************************************************
+ * Function: std::ostream& operator<<(std::ostream& os, const Maze& maze)
+ *
+ * Description:
+ * Prints the maze.
+ *
+ * Preconditions:
+ * None
+ *
+ * Postconditions:
+ * None
+ *
+ * ***************************************************************************/
 std::ostream& operator<<(std::ostream& os, const Maze& maze) {
   for(int row = 0; row <= maze.rows+1; row++) {
     os << maze.store[row] << std::endl;
@@ -116,7 +191,20 @@ std::ostream& operator<<(std::ostream& os, const Maze& maze) {
   return os;
 }
 
-/* Destructor */
+/* ****************************************************************************
+ * Function: Maze::~Maze()
+ *
+ * Description:
+ * Goes through store variable and deallocates them, since they were
+ * dynamically allocated in the constructor.
+ *
+ * Preconditions:
+ * An instance of the Maze class goes out of scope.
+ *
+ * Postconditions:
+ * store is unallocated properly.
+ *
+ * ***************************************************************************/
 Maze::~Maze() {
   for(int i = 0; i < rows+2; i++) {
     delete [] this->store[i];
