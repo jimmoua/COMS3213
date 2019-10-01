@@ -83,7 +83,10 @@ void ReverseStack(std::stack<int>& S, size_t size) {
     }
     moved = true;
   }
-  if(size == 0) return;
+  if(size == 0) {
+    moved = false;
+    return;
+  }
   int tmp = ss.top();
   ss.pop();
   /* Via recurrsion! */
