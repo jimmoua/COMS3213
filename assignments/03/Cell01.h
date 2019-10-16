@@ -1,5 +1,5 @@
-#ifndef CELL_H
-#define CELL_H
+#ifndef CELL01_H
+#define CELL01_H
 
 /* ****************************************************************************
  * Class: Cell

@@ -1,7 +1,7 @@
-#ifndef MAZE_H
-#define MAZE_H
-#include "Cell.h"
-#include "Stack.h"
+#ifndef MAZE01_H
+#define MAZE01_H
+#include "Cell01.h"
+#include "Stack01.h"
 #include <cstring>
 #include <iostream>
 
