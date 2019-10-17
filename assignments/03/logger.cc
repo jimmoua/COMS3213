@@ -5,9 +5,6 @@
 namespace jm {
   static const std::string fn = "cells.log";
 
-  /* Initializer funciton */
-  static void destroy();
-
   /* Object that we'll be using to log cells to the file */
   static std::ofstream openFile;
 
