@@ -1,9 +1,10 @@
-#ifndef MAZE02_H
-#define MAZE02_H
-#include "Cell02.h"
-#include "Stack02.h"
+#ifndef MAZE01_H
+#define MAZE01_H
+#include "Cell01.h"
+#include "Stack01.h"
 #include <cstring>
 #include <iostream>
+#include "logger.h"
 
 /* ****************************************************************************
  * Class: Maze
@@ -141,10 +142,11 @@ void Maze::exitMaze() {
   /* Use row and col to mark and keep track of current location, and set the
    * starting location to be the entry cell. */
   int row, col;
-  currentCell = entryCell;
-  while(!(currentCell == exitCell)) {
+  currentCell = exitCell;
+  while(!(currentCell == entryCell)) {
     row = currentCell.x;
     col = currentCell.y;
+    jm::log(currentCell.x, currentCell.y);
     std::cout << *this;
 
     /* Mark the current location as visited */
@@ -153,10 +155,10 @@ void Maze::exitMaze() {
     }
 
     /* Mark all adjacent nodes in the matrix as unvisited */
-    pushUnvisited(row-1, col);
-    pushUnvisited(row+1, col);
-    pushUnvisited(row, col-1);
-    pushUnvisited(row, col+1);
+    pushUnvisited(row-1, col);  // North
+    pushUnvisited(row+1, col);  // South
+    pushUnvisited(row, col-1);  // West
+    pushUnvisited(row, col+1);  // East
 
     /* If previous iteration of while loop gave us an empty stack, mouse failed
      * to get out of the maze */
@@ -165,8 +167,12 @@ void Maze::exitMaze() {
       std::cout << "Failure\n";
       return;
     }
-    else currentCell = mazeStack.pop();
+    else {
+      currentCell = mazeStack.pop();
+    }
   }
+  /* Log the last cell - the exit cell */
+  jm::log(currentCell.x, currentCell.y);
   std::cout << *this;
   std::cout << "Success\n";
 }
