@@ -212,10 +212,11 @@ void Maze::exitMaze() {
       Cell t = currentCell;
       // currentCell becomes a new one
       currentCell = mazeStack.pop();
+      /* REMOVAL OF DEAD ENDS
       // If we need to remove things on the east (if dropped down)
       if(currentCell.x > t.x && currentCell.y < t.y) {
         for(unsigned int i = currentCell.y+1; i <= t.y; i++) {
-          store[t.x][i] = '0';
+          store[t.x][i] = passage;
           cost--;
           for(auto iter = path.begin(); iter!= path.end(); iter++) {
             if(*iter == Cell(t.x,i)) {
@@ -228,7 +229,7 @@ void Maze::exitMaze() {
       // If we need to remove things on the west (if dropped down)
       else if(currentCell.x > t.x && currentCell.y > t.y) {
         for(unsigned int i = t.y; i <= currentCell.y-1; i++) {
-          store[t.x][i] = '0';
+          store[t.x][i] = passage;
           cost--;
           for(auto iter = path.begin(); iter!= path.end(); iter++) {
             if(*iter == Cell(t.x,i)) {
@@ -238,21 +239,12 @@ void Maze::exitMaze() {
           }
         }
       }
+      */
     }
   }
   /* Log the last cell - the exit cell */
   jm::log(currentCell.x, currentCell.y);
-  // Because the exit cell isn't pushed into the paths vector, we have to
-  // manually do it here...
-  path.push_back(currentCell);
-  cost++;
-  std::cout << *this;
-  std::cout << "Success\nCost: " << cost << std::endl;
-  for(const auto& i : path) {
-    printf("[%d, %d] ", i.x, i.y);
-  }
-  std::endl(std::cout);
-
+  
   // Here, we are getting the dead ends and adding them to the vector. The +2
   // offset is because we've surrounded the maze with a border of 1's. We can
   // either add an offset to rows,cols or add an offset to the indexes. Here,
@@ -260,11 +252,54 @@ void Maze::exitMaze() {
   std::vector<Cell> deadEnds;
   for(size_t i = 0; i < rows+2; i++) {
     for(size_t j = 0; j < cols+2; j++) {
-      if(store[i][j] == '0') {
+      if(store[i][j] == passage) {
         deadEnds.push_back(Cell(i, j));
+
+        // Commented the below -> After the success, pop the stack since it's
+        // the exit marker (should log first) and then proceed to traverse the
+        // maze (for dead ends).
+        // store[i][j] = visited;
       }
     }
   }
+
+  // Because the exit cell isn't pushed into the paths vector, we have to
+  // manually do it here... Pop the next unvisited Cell into the current cell
+  // so we can continue traversing.
+  path.push_back(currentCell);
+  currentCell = mazeStack.pop();
+  cost++;
+  std::cout << *this;
+
+  // Do not print success just yet...
+  //std::cout << "Success\nCost: " << cost << std::endl;
+  // Well, if it got here, that means the entry marker was found.
+  entryMarkerExists = true;
+
+  while(!mazeStack.empty()) {
+    row = currentCell.x;
+    col = currentCell.y;
+    jm::log(currentCell.x, currentCell.y);
+    std::cout << *this;
+    store[row][col] = visited;
+    
+    pushUnvisited(row-1, col);  // North
+    pushUnvisited(row+1, col);  // South
+    pushUnvisited(row, col-1);  // West
+    pushUnvisited(row, col+1);  // East
+
+    currentCell = mazeStack.pop();
+
+  }
+
+  // Do not print success just yet...
+  std::cout << "Success\nCost: " << cost << std::endl;
+  
+  for(const auto& i : path) {
+    printf("[%d, %d] ", i.x, i.y);
+  }
+  std::endl(std::cout);
+
   printf("Dead ends are at\n");
   for(const auto& i : deadEnds) {
     printf("[%d, %d] ", i.x, i.y);
