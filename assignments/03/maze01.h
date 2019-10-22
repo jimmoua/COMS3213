@@ -4,7 +4,6 @@
 #include "Stack01.h"
 #include <cstring>
 #include <iostream>
-#include "logger.h"
 
 /* ****************************************************************************
  * Class: Maze
@@ -146,7 +145,6 @@ void Maze::exitMaze() {
   while(!(currentCell == exitCell)) {
     row = currentCell.x;
     col = currentCell.y;
-    jm::log(currentCell.x, currentCell.y);
     std::cout << *this;
 
     /* Mark the current location as visited */
@@ -171,8 +169,6 @@ void Maze::exitMaze() {
       currentCell = mazeStack.pop();
     }
   }
-  /* Log the last cell - the exit cell */
-  jm::log(currentCell.x, currentCell.y);
   std::cout << *this;
   std::cout << "Success\n";
 }
