@@ -1,10 +1,9 @@
-#ifndef MAZE01_H
-#define MAZE01_H
+#ifndef MAZE02_H
+#define MAZE02_H
 #include "Cell01.h"
 #include "Stack01.h"
 #include <cstring>
 #include <iostream>
-#include "logger.h"
 #include <vector>
 
 /* ****************************************************************************
@@ -170,19 +169,19 @@ void Maze::exitMaze() {
   // and we descend downwards to perform more searches. While we search, we
   // should be concerned with the cost of the searches as this will be used to
   // compute the longest path to the entry.
-  int level = currentCell.x;
 
   while(!(currentCell == entryCell)) {
     row = currentCell.x;
     col = currentCell.y;
-    jm::log(currentCell.x, currentCell.y);
     std::cout << *this;
 
     // If the marked area is not the exit cell, mark it as visited.
     if(!(currentCell == exitCell)) {
       cost++;
       path.push_back(Cell(currentCell));
-      store[row][col] = visited;
+      if(store[row][col] != entryMarker) {
+        store[row][col] = visited;
+      }
     }
     // I was going to have currentCell == exitCell here as well, but it would
     // seem that will never quite work because by the time the exitCell is met,
@@ -212,11 +211,15 @@ void Maze::exitMaze() {
       Cell t = currentCell;
       // currentCell becomes a new one
       currentCell = mazeStack.pop();
-      /* REMOVAL OF DEAD ENDS
+
+      // Here, after dropping down a level, check to see if any dead ends need
+      // to be subtracted from the cost.
+
       // If we need to remove things on the east (if dropped down)
       if(currentCell.x > t.x && currentCell.y < t.y) {
-        for(unsigned int i = currentCell.y+1; i <= t.y; i++) {
-          store[t.x][i] = passage;
+        for(int i = currentCell.y+1; i <= t.y; i++) {
+          // Uncomment the below for maze03
+          //store[t.x][i] = passage;
           cost--;
           for(auto iter = path.begin(); iter!= path.end(); iter++) {
             if(*iter == Cell(t.x,i)) {
@@ -228,8 +231,9 @@ void Maze::exitMaze() {
       }
       // If we need to remove things on the west (if dropped down)
       else if(currentCell.x > t.x && currentCell.y > t.y) {
-        for(unsigned int i = t.y; i <= currentCell.y-1; i++) {
-          store[t.x][i] = passage;
+        for(int i = t.y; i <= currentCell.y-1; i++) {
+          // Uncomment the below for maze03
+          // store[t.x][i] = passage;
           cost--;
           for(auto iter = path.begin(); iter!= path.end(); iter++) {
             if(*iter == Cell(t.x,i)) {
@@ -239,19 +243,16 @@ void Maze::exitMaze() {
           }
         }
       }
-      */
     }
   }
-  /* Log the last cell - the exit cell */
-  jm::log(currentCell.x, currentCell.y);
   
   // Here, we are getting the dead ends and adding them to the vector. The +2
   // offset is because we've surrounded the maze with a border of 1's. We can
   // either add an offset to rows,cols or add an offset to the indexes. Here,
   // I've chose to add offsets to the rows,cols instead of indices.
   std::vector<Cell> deadEnds;
-  for(size_t i = 0; i < rows+2; i++) {
-    for(size_t j = 0; j < cols+2; j++) {
+  for(size_t i = 0; i < (size_t)rows+2; i++) {
+    for(size_t j = 0; j < (size_t)cols+2; j++) {
       if(store[i][j] == passage) {
         deadEnds.push_back(Cell(i, j));
 
@@ -279,9 +280,10 @@ void Maze::exitMaze() {
   while(!mazeStack.empty()) {
     row = currentCell.x;
     col = currentCell.y;
-    jm::log(currentCell.x, currentCell.y);
     std::cout << *this;
-    store[row][col] = visited;
+    if(store[row][col] != entryMarker) {
+      store[row][col] = visited;
+    }
     
     pushUnvisited(row-1, col);  // North
     pushUnvisited(row+1, col);  // South
@@ -292,7 +294,7 @@ void Maze::exitMaze() {
 
   }
 
-  // Do not print success just yet...
+  // Print success
   std::cout << "Success\nCost: " << cost << std::endl;
   
   for(const auto& i : path) {
