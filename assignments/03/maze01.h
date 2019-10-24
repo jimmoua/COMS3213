@@ -14,7 +14,6 @@
  * assigned the const values of the markers in the default constructor, but I
  * set the values here in the class, since it much more convenient and the
  * formatting looks much nicer.
- *
  * ***************************************************************************/
 class Maze {
   public:

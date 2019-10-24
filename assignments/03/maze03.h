@@ -39,7 +39,7 @@ class Maze {
     // not increment cost when we land on an entry marker or exit marker.
     // Therefore, we must account for those costs here. (According to the book,
     // we have to include these into the paths taken)
-    int rows, cols, cost = 0;
+    int rows, cols;
 };
 
 /* ****************************************************************************
@@ -177,7 +177,6 @@ void Maze::exitMaze() {
 
     // If the marked area is not the exit cell, mark it as visited.
     if(!(currentCell == exitCell)) {
-      cost++;
       path.push_back(Cell(currentCell));
       if(store[row][col] != entryMarker) {
         store[row][col] = visited;
@@ -188,7 +187,6 @@ void Maze::exitMaze() {
     // all... wait I still need to consider things such as is the entry is at the 
     else if(currentCell == entryCell || currentCell == exitCell) {
       path.push_back(Cell(currentCell));
-      cost++;
     }
 
     // Push the nodes around the current into the stack. Consider reading the
@@ -218,7 +216,6 @@ void Maze::exitMaze() {
       // If we need to remove things on the east (if dropped down)
       if(currentCell.x > t.x && currentCell.y < t.y) {
         for(int i = currentCell.y+1; i <= t.y; i++) {
-          cost--;
           for(auto iter = path.begin(); iter!= path.end(); iter++) {
             if(*iter == Cell(t.x,i)) {
               path.erase(iter);
@@ -230,7 +227,6 @@ void Maze::exitMaze() {
       // If we need to remove things on the west (if dropped down)
       else if(currentCell.x > t.x && currentCell.y > t.y) {
         for(int i = t.y; i <= currentCell.y-1; i++) {
-          cost--;
           for(auto iter = path.begin(); iter!= path.end(); iter++) {
             if(*iter == Cell(t.x,i)) {
               path.erase(iter);
@@ -265,7 +261,6 @@ void Maze::exitMaze() {
   // so we can continue traversing.
   path.push_back(currentCell);
   currentCell = mazeStack.pop();
-  cost++;
   std::cout << *this;
 
 
@@ -310,8 +305,9 @@ void Maze::exitMaze() {
 
   std::cout << *this;
 
-  std::cout << "Success\nCost: " << cost << std::endl;
+  std::cout << "Success\n";
   
+  printf("Path taken was: \n");
   for(const auto& i : path) {
     printf("[%d, %d] ", i.x, i.y);
   }

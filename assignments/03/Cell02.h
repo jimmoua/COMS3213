@@ -1,15 +1,14 @@
 #ifndef CELL02_H
 #define CELL02_H
 
-/* ****************************************************************************
+/* ----------------------------------------------------------------------------
  * Class: Cell
  *
  * Description:
  * This class acts as the simple structure to contain the x,y coordinates of
  * the entry cell, exit cell, and the current cell of the maze when the
  * exitMaze function is called.
- *
- * ***************************************************************************/
+ * --------------------------------------------------------------------------*/
 class Cell {
   public:
     Cell(int i = 0, int j = 0) {
