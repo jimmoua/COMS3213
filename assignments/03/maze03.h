@@ -1,5 +1,5 @@
-#ifndef MAZE03_H
-#define MAZE03_H
+#ifndef MAZE01_H
+#define MAZE01_H
 #include "Cell01.h"
 #include "Stack01.h"
 #include <cstring>
@@ -15,7 +15,6 @@
  * assigned the const values of the markers in the default constructor, but I
  * set the values here in the class, since it much more convenient and the
  * formatting looks much nicer.
- *
  * ***************************************************************************/
 class Maze {
   public:
@@ -29,17 +28,15 @@ class Maze {
     static constexpr char visited     = '.';
     static constexpr char passage     = '0';
     static constexpr char wall        = '1';
-    bool entryMarkerExists = false;
     Stack<Cell> mazeStack;
+    Stack<Cell> pathTaken;
+    Stack<Cell> deadEnds;
+    Stack<Cell> detour;
     char** store;
     void pushUnvisited(int,int);
     friend std::ostream& operator<<(std::ostream&, const Maze&);
-
-    // Cost equals two because the current way the program is written, it does
-    // not increment cost when we land on an entry marker or exit marker.
-    // Therefore, we must account for those costs here. (According to the book,
-    // we have to include these into the paths taken)
     int rows, cols;
+    bool mouseFound = false;
 };
 
 /* ****************************************************************************
@@ -125,19 +122,11 @@ Maze::Maze() {
  *
  * ***************************************************************************/
 void Maze::pushUnvisited(int row, int col) {
-
-  // This is just a dumb play with code, but I'm marking it like this for now...
-  // Basically, if the current position it equal to the entry cell nodes, that
-  // means the exit has found a pathway to the entry. However, we don't want to
-  // call it quits just yet because there is a possibility that we still have
-  // yet to calculate the longest path possible from the exit to the entry.
-
-  // In order to consider the longest path, we have to consider a path whose
-  // cost is the most expensive.
-
-  if(Cell(row, col) == entryCell) entryMarkerExists = true;
   if(store[row][col] == passage || store[row][col] == entryMarker) {
     mazeStack.push(Cell(row,col));
+  }
+  if(Cell(row,col) == entryCell) {
+    mouseFound = true;
   }
 }
 
@@ -160,158 +149,127 @@ void Maze::exitMaze() {
    * starting location to be the entry cell. */
   int row, col;
   currentCell = exitCell;
-
-  std::vector<Cell> path;
-
-
-  // Let level be the node we start at (entryCell.x) If the level were to
-  // increment by 1, that means we preformed a breadth-first search on the row,
-  // and we descend downwards to perform more searches. While we search, we
-  // should be concerned with the cost of the searches as this will be used to
-  // compute the longest path to the entry.
-
   while(!(currentCell == entryCell)) {
     row = currentCell.x;
     col = currentCell.y;
-    std::cout << *this;
-
-    // If the marked area is not the exit cell, mark it as visited.
-    if(!(currentCell == exitCell)) {
-      path.push_back(Cell(currentCell));
-      if(store[row][col] != entryMarker) {
-        store[row][col] = visited;
+    // If top of the mazeStack has not been visited already, push it into the
+    // path stack.
+    if(store[row][col] != visited) {
+      pathTaken.push(Cell(row,col));
+      if(mouseFound) {
+        detour.push(Cell(row,col));
       }
     }
-    // I was going to have currentCell == exitCell here as well, but it would
-    // seem that will never quite work because by the time the exitCell is met,
-    // all... wait I still need to consider things such as is the entry is at the 
-    else if(currentCell == entryCell || currentCell == exitCell) {
-      path.push_back(Cell(currentCell));
+    std::cout << *this;
+
+    /* Mark the current location as visited */
+    if(!(currentCell == exitCell)) {
+      store[row][col] = visited;
     }
 
-    // Push the nodes around the current into the stack. Consider reading the
-    // comments from this function to see what gets pushed into the stack and
-    // what does not get pushed into the stack
-    pushUnvisited(row-1, col);  // North
-    pushUnvisited(row+1, col);  // South
-    pushUnvisited(row, col-1);  // West
-    pushUnvisited(row, col+1);  // East
+    /* Mark all adjacent nodes in the matrix as unvisited */
+    pushUnvisited(row-1, col);
+    pushUnvisited(row+1, col);
+    pushUnvisited(row, col-1);
+    pushUnvisited(row, col+1);
 
-    /* If previous iteration of while loop gave us an empty stack, mouse failed
-     * to get out of the maze */
-    if(mazeStack.empty()) {
+    if(!pathTaken.empty()) {
+      // While loop → while we are at a dead end
+      while(store[pathTaken.top().x-1][pathTaken.top().y] != passage &&
+            store[pathTaken.top().x+1][pathTaken.top().y] != passage &&
+            store[pathTaken.top().x][pathTaken.top().y-1] != passage &&
+            store[pathTaken.top().x][pathTaken.top().y+1] != passage)
+      {
+        // If the entry path is found, while traversing, break away from
+        // "backtracking" from the dead ends. We do not want count dead ends
+        // when we find the entryCell. Instead, we want to discover (if
+        // possible) a detour.
+        if(store[pathTaken.top().x-1][pathTaken.top().y] == entryMarker ||
+           store[pathTaken.top().x+1][pathTaken.top().y] == entryMarker ||
+           store[pathTaken.top().x][pathTaken.top().y-1] == entryMarker ||
+           store[pathTaken.top().x][pathTaken.top().y+1] == entryMarker)
+        {
+          break;
+        }
+        deadEnds.push(pathTaken.pop());
+        if(pathTaken.empty()) break;
+      }
+    }
+
+    if(mazeStack.empty() && !mouseFound) {
       std::cout << *this;
       std::cout << "Failure\n";
       return;
     }
     else {
-      // t is the "old" cell
-      Cell t = currentCell;
-      // currentCell becomes a new one
-      currentCell = mazeStack.pop();
-
-      // Here, after dropping down a level, check to see if any dead ends need
-      // to be subtracted from the cost.
-
-      // If we need to remove things on the east (if dropped down)
-      if(currentCell.x > t.x && currentCell.y < t.y) {
-        for(int i = currentCell.y+1; i <= t.y; i++) {
-          for(auto iter = path.begin(); iter!= path.end(); iter++) {
-            if(*iter == Cell(t.x,i)) {
-              path.erase(iter);
-              break;
-            }
-          }
-        }
+      if(!mazeStack.empty()) {
+        currentCell = mazeStack.pop();
       }
-      // If we need to remove things on the west (if dropped down)
-      else if(currentCell.x > t.x && currentCell.y > t.y) {
-        for(int i = t.y; i <= currentCell.y-1; i++) {
-          for(auto iter = path.begin(); iter!= path.end(); iter++) {
-            if(*iter == Cell(t.x,i)) {
-              path.erase(iter);
-              break;
-            }
-          }
-        }
-      }
+      else
+        break;
     }
   }
-  
-  // Here, we are getting the dead ends and adding them to the vector. The +2
-  // offset is because we've surrounded the maze with a border of 1's. We can
-  // either add an offset to rows,cols or add an offset to the indexes. Here,
-  // I've chose to add offsets to the rows,cols instead of indices.
-  std::vector<Cell> deadEnds;
-  for(size_t i = 0; i < (size_t)rows+2; i++) {
-    for(size_t j = 0; j < (size_t)cols+2; j++) {
-      if(store[i][j] == passage) {
-        deadEnds.push_back(Cell(i, j));
-
-        // Commented the below -> After the success, pop the stack since it's
-        // the exitk marker (should log first) and then proceed to traverse the
-        // maze (for dead ends).
-         store[i][j] = visited;
-      }
-    }
-  }
-
-  // Because the exit cell isn't pushed into the paths vector, we have to
-  // manually do it here... Pop the next unvisited Cell into the current cell
-  // so we can continue traversing.
-  path.push_back(currentCell);
+  pathTaken.push(currentCell);
   currentCell = mazeStack.pop();
-  std::cout << *this;
-
-
-  entryMarkerExists = true;
-
   while(!mazeStack.empty()) {
     row = currentCell.x;
     col = currentCell.y;
     std::cout << *this;
-    if(store[row][col] != entryMarker) {
+
+    /* Mark the current location as visited */
+    if(!(currentCell == exitCell)) {
       store[row][col] = visited;
     }
-    
-    pushUnvisited(row-1, col);  // North
-    pushUnvisited(row+1, col);  // South
-    pushUnvisited(row, col-1);  // West
-    pushUnvisited(row, col+1);  // East
 
-    currentCell = mazeStack.pop();
+    /* Mark all adjacent nodes in the matrix as unvisited */
+    pushUnvisited(row-1, col);
+    pushUnvisited(row+1, col);
+    pushUnvisited(row, col-1);
+    pushUnvisited(row, col+1);
 
+    while(true) {
+      if(mazeStack.empty()) break;
+      Cell foo = mazeStack.top();
+      if(store[foo.x][foo.y] == visited ||
+         store[foo.x][foo.y] == exitMarker ||
+         store[foo.x][foo.y] == entryMarker)
+      {
+        mazeStack.pop();
+        continue;
+      }
+      else break;
+    }
+    if(!mazeStack.empty()) {
+      deadEnds.push(mazeStack.top());
+      currentCell = mazeStack.pop();
+    }
   }
-  
-  // Before printing, we will use an algorithm to change the dots into either a
-  // dash or a vertical line.
-  //
-  // Let M be a any row within the maze.
-  // Let N be the row below M, hence N = M+1
-  // Convert all visited markers into dashes
-  //
-  // Once we have descended down to row N, we will use the column position to
-  // determine where the vertical line marker should be.
-
-  // First, set all the visited marks to the dash
-  for(auto i = path.begin(); i != path.end(); i++) {
+  std::cout << *this;
+  // REVERSE THE PATH TAKEN STACK IN ORDER TO PRINT IT
+  std::vector<Cell> pathVector;
+  Stack<Cell> t = pathTaken;
+  while(!pathTaken.empty()) pathTaken.pop();
+  while(!t.empty()) pathTaken.push(t.pop());
+  while(!pathTaken.empty()) {
+    pathVector.push_back(pathTaken.pop());
+  }
+  for(auto i = pathVector.begin(); i != pathVector.end(); i++) {
     if(store[i->x][i->y] != exitMarker && store[i->x][i->y] != entryMarker) {
       store[i->x][i->y] = '-';
-      if(i->x != (i-1)->x) {
+      if(i->x !=(i-1)->x) {
         store[i->x][i->y] = '|';
       }
     }
   }
-
+  printf("\n");
   std::cout << *this;
-
   std::cout << "Success\n";
-  
-  printf("Path taken was: \n");
-  for(const auto& i : path) {
-    printf("[%d, %d] ", i.x, i.y);
+  printf("Path taken:\n");
+  for(const auto& i : pathVector) {
+    printf("(%d, %d) ", i.x, i.y);
   }
   printf("\n");
+  // REVERSE PRINT END
 }
 
 /* ****************************************************************************

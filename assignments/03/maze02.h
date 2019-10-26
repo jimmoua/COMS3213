@@ -159,7 +159,6 @@ void Maze::exitMaze() {
         detour.push(Cell(row,col));
       }
     }
-    printf("Current: %d %d\n", row, col);
     std::cout << *this;
 
     /* Mark the current location as visited */
@@ -179,6 +178,10 @@ void Maze::exitMaze() {
             store[pathTaken.top().x][pathTaken.top().y-1] != passage &&
             store[pathTaken.top().x][pathTaken.top().y+1] != passage)
       {
+        // If the entry path is found, while traversing, break away from
+        // "backtracking" from the dead ends. We do not want count dead ends
+        // when we find the entryCell. Instead, we want to discover (if
+        // possible) a detour.
         if(store[pathTaken.top().x-1][pathTaken.top().y] == entryMarker ||
            store[pathTaken.top().x+1][pathTaken.top().y] == entryMarker ||
            store[pathTaken.top().x][pathTaken.top().y-1] == entryMarker ||
