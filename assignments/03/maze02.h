@@ -154,16 +154,13 @@ void Maze::exitMaze() {
     // path stack.
     if(store[row][col] != visited)
       pathTaken.push(Cell(row,col));
-    printf("Maze:\n");
+    printf("Current: %d %d\n", row, col);
     std::cout << *this;
 
     /* Mark the current location as visited */
     if(!(currentCell == exitCell)) {
       store[row][col] = visited;
     }
-    //else if(currentCell == entryCell) {
-      //pathTaken.push(currentCell);
-    //}
 
     /* Mark all adjacent nodes in the matrix as unvisited */
     pushUnvisited(row-1, col);
@@ -182,6 +179,7 @@ void Maze::exitMaze() {
            store[pathTaken.top().x][pathTaken.top().y-1] == entryMarker ||
            store[pathTaken.top().x][pathTaken.top().y+1] == entryMarker) break;
           deadEnds.push(pathTaken.pop());
+          if(pathTaken.empty()) break;
       }
     }
 
@@ -190,18 +188,40 @@ void Maze::exitMaze() {
     if(mazeStack.empty() && !mouseFound) {
       std::cout << *this;
       std::cout << "Failure\n";
-      break;
+      return;
     }
     else {
-      if(!mazeStack.empty())
+      if(!mazeStack.empty()) {
         currentCell = mazeStack.pop();
+      }
       else
         break;
     }
   }
+  pathTaken.push(currentCell);
+  currentCell = mazeStack.pop();
+  while(!mazeStack.empty()) {
+    row = currentCell.x;
+    col = currentCell.y;
+    std::cout << *this;
+
+    /* Mark the current location as visited */
+    if(!(currentCell == exitCell)) {
+      store[row][col] = visited;
+    }
+
+    /* Mark all adjacent nodes in the matrix as unvisited */
+    pushUnvisited(row-1, col);
+    pushUnvisited(row+1, col);
+    pushUnvisited(row, col-1);
+    pushUnvisited(row, col+1);
+
+    deadEnds.push(mazeStack.top());
+    currentCell = mazeStack.pop();
+  }
   std::cout << *this;
   std::cout << "Success\n";
-  // Reverse the path taken stack in order to print it
+  // REVERSE THE PATH TAKEN STACK IN ORDER TO PRINT IT
   printf("Path taken:\n");
   Stack<Cell> t = pathTaken;
   while(!pathTaken.empty()) pathTaken.pop();
