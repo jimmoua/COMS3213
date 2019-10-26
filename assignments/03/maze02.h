@@ -30,6 +30,7 @@ class Maze {
     Stack<Cell> mazeStack;
     Stack<Cell> pathTaken;
     Stack<Cell> deadEnds;
+    Stack<Cell> detour;
     char** store;
     void pushUnvisited(int,int);
     friend std::ostream& operator<<(std::ostream&, const Maze&);
@@ -152,8 +153,12 @@ void Maze::exitMaze() {
     col = currentCell.y;
     // If top of the mazeStack has not been visited already, push it into the
     // path stack.
-    if(store[row][col] != visited)
+    if(store[row][col] != visited) {
       pathTaken.push(Cell(row,col));
+      if(mouseFound) {
+        detour.push(Cell(row,col));
+      }
+    }
     printf("Current: %d %d\n", row, col);
     std::cout << *this;
 
@@ -183,8 +188,6 @@ void Maze::exitMaze() {
       }
     }
 
-    /* If previous iteration of while loop gave us an empty stack, mouse failed
-     * to get out of the maze */
     if(mazeStack.empty() && !mouseFound) {
       std::cout << *this;
       std::cout << "Failure\n";
@@ -216,8 +219,22 @@ void Maze::exitMaze() {
     pushUnvisited(row, col-1);
     pushUnvisited(row, col+1);
 
-    deadEnds.push(mazeStack.top());
-    currentCell = mazeStack.pop();
+    while(true) {
+      if(mazeStack.empty()) break;
+      Cell foo = mazeStack.top();
+      if(store[foo.x][foo.y] == visited ||
+         store[foo.x][foo.y] == exitMarker ||
+         store[foo.x][foo.y] == entryMarker)
+      {
+        mazeStack.pop();
+        continue;
+      }
+      else break;
+    }
+    if(!mazeStack.empty()) {
+      deadEnds.push(mazeStack.top());
+      currentCell = mazeStack.pop();
+    }
   }
   std::cout << *this;
   std::cout << "Success\n";
@@ -230,11 +247,17 @@ void Maze::exitMaze() {
     printf("(%d, %d) ", pathTaken.top().x, pathTaken.top().y);
     pathTaken.pop();
   }
-  printf("\nDead ends are:\n");
+  printf("\n\nDead ends are:\n");
   while(!deadEnds.empty()) {
     printf("(%d, %d) ", deadEnds.top().x, deadEnds.top().y);
     deadEnds.pop();
   }
+  printf("\n\nDetours:\n");
+  while(!detour.empty()) {
+    printf("(%d, %d) ", detour.top().x, detour.top().y);
+    detour.pop();
+  }
+  printf("\n");
   // REVERSE PRINT END
 }
 
