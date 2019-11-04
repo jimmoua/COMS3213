@@ -87,3 +87,7 @@ createPerfectTree() {
 ```
 
 ## AVL Trees
+
+A binary tree is an **AVL** tree that is empty or satisfies the following two:
+1. The heights of the left and rigth subtrees differ by **at most** 1
+2. The left and right subtrees are AVL trees.
