@@ -99,3 +99,6 @@ void preOrder(Node* node) {
   }
 }
 ```
+
+# Handshaking Lemma
+This is a proof that says `in any graph, the sum of all vertex-degree is equal to twice the number of edges`.
