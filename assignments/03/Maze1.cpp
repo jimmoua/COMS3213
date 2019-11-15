@@ -1,9 +1,83 @@
-#ifndef MAZE01_H
-#define MAZE01_H
-#include "Cell01.h"
-#include "Stack01.h"
-#include <cstring>
+/* ----------------------------------------------------------------------------
+ *       Name: Jim Moua
+ * Program 03: Maze01
+ *        Due: 10/27/2019
+ *
+ * Description:
+ * A maze program where a mouse will try to escape a given input maze.
+ *
+ * Input:
+ * The input are lines that will represent an N×M matrix.
+ * with values of
+ *          m   →  entry marker
+ *          e   →  exit marker
+ *          0   →  passage marker
+ *          1   →  wall marker
+ *
+ *    example maze input:
+ *      
+ *       e0000
+ *       11011
+ *       00000
+ *       00m00
+ *
+ * Output:
+ * Will print each step the mouse takes in order to escape the maze by denoting
+ * the paths with a '.' - meaning that the mouse had traversed it.
+ *
+ *    example maze (final) output:
+ *     1111111     1111111
+ *     1e00001  →  1e....1
+ *     1110111  →  111.111
+ *     1000001  →  1.....1
+ *     100m001  →  1..m..1
+ *     1111111     1111111
+ * --------------------------------------------------------------------------*/
+
 #include <iostream>
+#include <cstring>
+#include <stack>
+
+/* ****************************************************************************
+ * Class: Stack
+ *
+ * Description:
+ * This inherits the std::stack<> class from the STL. All it does is have its
+ * own overide function of pop. From the STL, pop returns nothing, but we
+ * implemented this pop in order to return the top of the stack before actually
+ * discarding it.
+ *
+ * ***************************************************************************/
+template<typename T>
+class Stack: public std::stack<T> {
+  public:
+    T pop() {
+      T tmp = std::stack<T>::top();
+      std::stack<T>::pop();
+      return tmp;
+    }
+};
+
+/* ----------------------------------------------------------------------------
+ * Class: Cell
+ *
+ * Description:
+ * This class acts as the simple structure to contain the x,y coordinates of
+ * the entry cell, exit cell, and the current cell of the maze when the
+ * exitMaze function is called.
+ * --------------------------------------------------------------------------*/
+class Cell {
+  public:
+    Cell(int i = 0, int j = 0) {
+      x = i; y = j;
+    }
+    bool operator==(const Cell& c) const {
+      return (x == c.x && y == c.y);
+    }
+  private:
+    int x, y;
+    friend class Maze;
+};
 
 /* ****************************************************************************
  * Class: Maze
@@ -33,6 +107,15 @@ class Maze {
     friend std::ostream& operator<<(std::ostream&, const Maze&);
     int rows, cols;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// Function:
+// main()
+////////////////////////////////////////////////////////////////////////////////
+int main() {
+  Maze().exitMaze();
+  return 0;
+}
 
 /* ****************************************************************************
  * Function: Maze::Maze()
@@ -213,5 +296,3 @@ Maze::~Maze() {
   }
   delete [] this->store;
 }
-
-#endif

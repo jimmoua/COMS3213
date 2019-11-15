@@ -1,10 +1,102 @@
-#ifndef MAZE01_H
-#define MAZE01_H
-#include "Cell01.h"
-#include "Stack01.h"
-#include <cstring>
+/* ----------------------------------------------------------------------------
+ *       Name: Jim Moua
+ * Program 03: Maze02
+ *        Due: 10/27/2019
+ *
+ * Description:
+ * A maze program where the entry is marked back to entry marker (or the
+ * mouse).
+ *
+ * Input:
+ * The input are lines that will represent an N×M matrix.
+ * with values of
+ *          m   →  entry marker
+ *          e   →  exit marker
+ *          0   →  passage marker
+ *          1   →  wall marker
+ *
+ *    example maze input:
+ *      
+ *        e0000
+ *        11011
+ *        00000
+ *        00m00
+ *
+ * Output:
+ * After inputting, the program will surround the maze with a wall of 1's.
+ * Will also print each step the exit maps to the mouse or entry cell denoting
+ * the paths with a '.'
+ *
+ * After this, it will print (row, col) markers of the path that was taken from
+ * the exit to the entry marker as well as the dead ends.
+ *
+ *    example maze output:
+ *     1111111
+ *     1e00001
+ *     1110111
+ *     1000001
+ *     100m001
+ *     1111111
+ *        ↓
+ *      (...)          I used ellipses to denote other maze prints
+ *        ↓
+ *     1111111
+ *     1e....1
+ *     111.111
+ *     1.....1
+ *     1..m..1
+ *     1111111
+ *
+ *     Path taken was
+ *     [1, 1] [1, 2] [1, 3] [2, 3] [3, 3] [3, 4] [3, 5] [4, 5] [4, 4] [4, 3] 
+ *
+ *     Dead ends are at
+ *     [3, 1] [3, 2] [4, 1] [4, 2]
+ * --------------------------------------------------------------------------*/
 #include <iostream>
-#include <vector>
+#include <cstring>
+#include <stack>
+
+/* ****************************************************************************
+ * Class: Stack
+ *
+ * Description:
+ * This inherits the std::stack<> class from the STL. All it does is have its
+ * own overide function of pop. From the STL, pop returns nothing, but we
+ * implemented this pop in order to return the top of the stack before actually
+ * discarding it.
+ *
+ * ***************************************************************************/
+template<typename T>
+class Stack: public std::stack<T> {
+  public:
+    T pop() {
+      T tmp = std::stack<T>::top();
+      std::stack<T>::pop();
+      return tmp;
+    }
+};
+
+/* ----------------------------------------------------------------------------
+ * Class: Cell
+ *
+ * Description:
+ * This class acts as the simple structure to contain the x,y coordinates of
+ * the entry cell, exit cell, and the current cell of the maze when the
+ * exitMaze function is called.
+ * --------------------------------------------------------------------------*/
+class Cell {
+  public:
+    Cell(int i = 0, int j = 0) {
+      x = i; y = j;
+    }
+    bool operator==(const Cell& c) const {
+      return (x == c.x && y == c.y);
+    }
+  private:
+    int x, y;
+    friend class Maze;
+};
 
 /* ****************************************************************************
  * Class: Maze
@@ -38,6 +130,14 @@ class Maze {
     int rows, cols;
     bool mouseFound = false;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// Function: main()
+////////////////////////////////////////////////////////////////////////////////
+int main() {
+  Maze().exitMaze();
+  return 0;
+}
 
 /* ****************************************************************************
  * Function: Maze::Maze()
@@ -174,7 +274,6 @@ void Maze::exitMaze() {
     pushUnvisited(row, col+1);
 
     if(!pathTaken.empty()) {
-      // While loop → while we are at a dead end
       while(store[pathTaken.top().x-1][pathTaken.top().y] != passage &&
             store[pathTaken.top().x+1][pathTaken.top().y] != passage &&
             store[pathTaken.top().x][pathTaken.top().y-1] != passage &&
@@ -187,12 +286,9 @@ void Maze::exitMaze() {
         if(store[pathTaken.top().x-1][pathTaken.top().y] == entryMarker ||
            store[pathTaken.top().x+1][pathTaken.top().y] == entryMarker ||
            store[pathTaken.top().x][pathTaken.top().y-1] == entryMarker ||
-           store[pathTaken.top().x][pathTaken.top().y+1] == entryMarker)
-        {
-          break;
-        }
-        deadEnds.push(pathTaken.pop());
-        if(pathTaken.empty()) break;
+           store[pathTaken.top().x][pathTaken.top().y+1] == entryMarker) break;
+          deadEnds.push(pathTaken.pop());
+          if(pathTaken.empty()) break;
       }
     }
 
@@ -245,28 +341,25 @@ void Maze::exitMaze() {
     }
   }
   std::cout << *this;
+  std::cout << "Success\n";
   // REVERSE THE PATH TAKEN STACK IN ORDER TO PRINT IT
-  std::vector<Cell> pathVector;
+  printf("Path taken:\n");
   Stack<Cell> t = pathTaken;
   while(!pathTaken.empty()) pathTaken.pop();
   while(!t.empty()) pathTaken.push(t.pop());
   while(!pathTaken.empty()) {
-    pathVector.push_back(pathTaken.pop());
+    printf("(%d, %d) ", pathTaken.top().x, pathTaken.top().y);
+    pathTaken.pop();
   }
-  for(auto i = pathVector.begin(); i != pathVector.end(); i++) {
-    if(store[i->x][i->y] != exitMarker && store[i->x][i->y] != entryMarker) {
-      store[i->x][i->y] = '-';
-      if(i->x !=(i-1)->x) {
-        store[i->x][i->y] = '|';
-      }
-    }
+  printf("\n\nDead ends are:\n");
+  while(!deadEnds.empty()) {
+    printf("(%d, %d) ", deadEnds.top().x, deadEnds.top().y);
+    deadEnds.pop();
   }
-  printf("\n");
-  std::cout << *this;
-  std::cout << "Success\n";
-  printf("Path taken:\n");
-  for(const auto& i : pathVector) {
-    printf("(%d, %d) ", i.x, i.y);
+  printf("\n\nDetours:\n");
+  while(!detour.empty()) {
+    printf("(%d, %d) ", detour.top().x, detour.top().y);
+    detour.pop();
   }
   printf("\n");
   // REVERSE PRINT END
@@ -313,5 +406,3 @@ Maze::~Maze() {
   }
   delete [] this->store;
 }
-
-#endif
