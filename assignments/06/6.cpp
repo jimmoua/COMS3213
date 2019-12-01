@@ -61,10 +61,8 @@ int main() {
   Polynomial p2;
   std::cout << "Please enter two polynomial, each ending with a semicolon\n";
   std::cin >> p1 >> p2;
-  Polynomial sum = p1+p2;;
-  Polynomial product = p1*p2;;
-  std::cout << "      Addition: " << sum << std::endl;
-  std::cout << "Multiplication: " << product << std::endl;
+  std::cout << "      Addition: " << p1+p2 << std::endl;
+  std::cout << "Multiplication: " << p1*p2 << std::endl;
   return 0;
 }
 
